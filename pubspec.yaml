@@ -1,0 +1,14 @@
+name: modbus
+description: A pure Dart modbus library supporting RTU, ASCII, and TCP client/server implementations
+version: 1.0.0
+homepage: https://github.com/yourname/dart-modbus
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  yaml: ^3.1.0
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0

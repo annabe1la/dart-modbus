@@ -1,0 +1,109 @@
+name: "Temperature Controller"
+slaveId: 1
+protocol: tcp
+address: "127.0.0.1:5020"
+pollInterval: 1000  # Milliseconds
+
+registers:
+  # Temperature sensor (Float32, 2 registers)
+  - name: temperature
+    address: 100
+    type: inputRegister
+    dataType: float32
+    byteOrder: bigEndian
+    multiplier: 1.0
+    unit: "°C"
+    description: "Current temperature reading"
+    readOnly: true
+
+  # Humidity sensor (Float32, 2 registers)
+  - name: humidity
+    address: 102
+    type: inputRegister
+    dataType: float32
+    byteOrder: bigEndian
+    multiplier: 1.0
+    unit: "%RH"
+    description: "Current humidity reading"
+    readOnly: true
+
+  # Pressure sensor (Int32, 2 registers)
+  - name: pressure
+    address: 104
+    type: inputRegister
+    dataType: int32
+    byteOrder: bigEndian
+    multiplier: 0.01
+    unit: "kPa"
+    description: "Current pressure reading"
+    readOnly: true
+
+  # Temperature setpoint (Float32, 2 registers)
+  - name: setpoint
+    address: 200
+    type: holdingRegister
+    dataType: float32
+    byteOrder: bigEndian
+    multiplier: 1.0
+    unit: "°C"
+    description: "Temperature setpoint"
+    readOnly: false
+
+  # Control mode (UInt16, 1 register)
+  - name: controlMode
+    address: 202
+    type: holdingRegister
+    dataType: uint16
+    byteOrder: bigEndian
+    description: "0=Manual, 1=Auto, 2=Off"
+    readOnly: false
+
+  # Fan speed (UInt16, 1 register)
+  - name: fanSpeed
+    address: 203
+    type: holdingRegister
+    dataType: uint16
+    byteOrder: bigEndian
+    multiplier: 1.0
+    unit: "RPM"
+    description: "Fan speed in RPM"
+    readOnly: false
+
+  # System status coils
+  - name: systemOn
+    address: 0
+    type: coil
+    dataType: bool
+    description: "System power on/off"
+    readOnly: false
+
+  - name: alarmActive
+    address: 1
+    type: coil
+    dataType: bool
+    description: "Alarm status"
+    readOnly: false
+
+  # Discrete inputs
+  - name: doorOpen
+    address: 0
+    type: discreteInput
+    dataType: bool
+    description: "Door open sensor"
+    readOnly: true
+
+  - name: filterDirty
+    address: 1
+    type: discreteInput
+    dataType: bool
+    description: "Filter needs replacement"
+    readOnly: true
+
+  # Device name (String, 10 registers = 20 bytes)
+  - name: deviceName
+    address: 300
+    type: holdingRegister
+    dataType: string
+    quantity: 10
+    description: "Device identifier string"
+    readOnly: false
