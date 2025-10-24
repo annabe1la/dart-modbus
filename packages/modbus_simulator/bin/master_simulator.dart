@@ -1,11 +1,13 @@
 import 'dart:async';
-import '../lib/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 /// Modbus master simulator that polls registers based on point table
 ///
-/// Usage: dart run simulator/master_simulator.dart [config.yaml]
+/// Usage: dart run packages/modbus_simulator/bin/master_simulator.dart [config.yaml]
 void main(List<String> args) async {
-  final configPath = args.isNotEmpty ? args[0] : 'simulator/device_config.yaml';
+  final configPath = args.isNotEmpty
+      ? args[0]
+      : 'packages/modbus_simulator/config/device_config.yaml';
 
   print('Loading configuration from: $configPath');
   final config = await PointTableConfig.fromFile(configPath);
@@ -54,11 +56,13 @@ Future<void> _runTCPMaster(PointTableConfig config) async {
         final values = await registerMap.readAll(client);
 
         for (final entry in values.entries) {
-          final reg = registerMap.registers.firstWhere((r) => r.name == entry.key);
+          final reg =
+              registerMap.registers.firstWhere((r) => r.name == entry.key);
           final value = entry.value;
           final unit = reg.unit != null ? ' ${reg.unit}' : '';
 
-          print('  ${reg.name}: $value$unit (${reg.type.name} @ ${reg.address})');
+          print(
+              '  ${reg.name}: $value$unit (${reg.type.name} @ ${reg.address})');
         }
 
         print('');

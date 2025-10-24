@@ -1,0 +1,165 @@
+name: dart_modbus
+
+packages:
+  - packages/**
+
+command:
+  version:
+    # 自动更新 CHANGELOG
+    updateGitTagRefs: true
+    # 使用 conventional commits
+    message: "chore(release): publish {version}"
+    # 集成 cider
+    hooks:
+      preCommit: |
+        melos exec -- "dart pub global run cider release"
+
+  bootstrap:
+    # 运行 pub get
+    runPubGetInParallel: true
+
+scripts:
+  # 分析所有代码
+  analyze:
+    run: dart analyze
+    description: 运行 Dart 静态分析
+
+  # 运行所有测试
+  test:
+    run: dart test
+    description: 运行所有单元测试
+
+  # 运行测试并生成覆盖率
+  test:coverage:
+    run: dart test --coverage=coverage
+    description: 运行测试并生成覆盖率报告
+
+  # 格式化代码
+  format:
+    run: dart format . --fix
+    description: 格式化所有 Dart 代码
+
+  # 格式化检查（CI 用）
+  format:check:
+    run: dart format . --set-exit-if-changed
+    description: 检查代码格式
+
+  # 清理构建产物
+  clean:
+    run: dart pub cache clean
+    description: 清理缓存
+
+  # RTU 模拟器
+  simulator:rtu:slave:
+    run: dart run packages/modbus_simulator/bin/rtu_slave.dart
+    description: 启动 Modbus RTU 从站模拟器
+    packageFilters:
+      scope: modbus_simulator
+
+  simulator:rtu:master:
+    run: dart run packages/modbus_simulator/bin/rtu_master.dart
+    description: 启动 Modbus RTU 主站模拟器
+    packageFilters:
+      scope: modbus_simulator
+
+  # TCP 模拟器
+  simulator:tcp:slave:
+    run: dart run packages/modbus_simulator/bin/tcp_slave.dart
+    description: 启动 Modbus TCP 从站模拟器
+    packageFilters:
+      scope: modbus_simulator
+
+  simulator:tcp:master:
+    run: dart run packages/modbus_simulator/bin/tcp_master.dart
+    description: 启动 Modbus TCP 主站模拟器
+    packageFilters:
+      scope: modbus_simulator
+
+  # ASCII 模拟器
+  simulator:ascii:slave:
+    run: dart run packages/modbus_simulator/bin/ascii_slave.dart
+    description: 启动 Modbus ASCII 从站模拟器
+    packageFilters:
+      scope: modbus_simulator
+
+  simulator:ascii:master:
+    run: dart run packages/modbus_simulator/bin/ascii_master.dart
+    description: 启动 Modbus ASCII 主站模拟器
+    packageFilters:
+      scope: modbus_simulator
+
+  # CHANGELOG 管理
+  changelog:add:
+    run: dart pub global run cider log added "$0"
+    description: "添加新功能到 CHANGELOG (用法: melos run changelog:add \"功能描述\")"
+
+  changelog:fix:
+    run: dart pub global run cider log fixed "$0"
+    description: "添加 bug 修复到 CHANGELOG (用法: melos run changelog:fix \"修复描述\")"
+
+  changelog:change:
+    run: dart pub global run cider log changed "$0"
+    description: "添加变更到 CHANGELOG (用法: melos run changelog:change \"变更描述\")"
+
+  changelog:show:
+    run: dart pub global run cider describe
+    description: 显示未发布的 CHANGELOG
+
+  # 版本管理
+  version:patch:
+    run: |
+      dart pub global run cider bump patch
+      dart pub global run cider release
+    description: 发布补丁版本 (1.0.0 -> 1.0.1)
+
+  version:minor:
+    run: |
+      dart pub global run cider bump minor
+      dart pub global run cider release
+    description: 发布次版本 (1.0.0 -> 1.1.0)
+
+  version:major:
+    run: |
+      dart pub global run cider bump major
+      dart pub global run cider release
+    description: 发布主版本 (1.0.0 -> 2.0.0)
+
+  # CI 工作流
+  ci:
+    run: |
+      melos run format:check &&
+      melos run analyze &&
+      melos run test
+    description: 运行完整 CI 检查
+
+  # 发布前检查
+  prerelease:
+    run: |
+      melos run ci &&
+      melos run changelog:show
+    description: 发布前的完整检查
+
+  # 示例运行
+  example:tcp:
+    run: dart run packages/dart_modbus/example/client_tcp_example.dart
+    description: 运行 TCP 客户端示例
+    packageFilters:
+      scope: dart_modbus
+
+  example:rtu:
+    run: dart run packages/dart_modbus/example/client_rtu_example.dart
+    description: 运行 RTU 客户端示例
+    packageFilters:
+      scope: dart_modbus
+
+  example:conversion:
+    run: dart run packages/dart_modbus/example/data_conversion_example.dart
+    description: 运行数据转换示例
+    packageFilters:
+      scope: dart_modbus
+
+  example:register:
+    run: dart run packages/dart_modbus/example/register_map_example.dart
+    description: 运行寄存器映射示例
+    packageFilters:
+      scope: dart_modbus

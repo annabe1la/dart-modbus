@@ -1,11 +1,13 @@
 import 'dart:typed_data';
-import '../lib/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 /// Modbus slave simulator that responds with random data
 ///
-/// Usage: dart run simulator/slave_simulator.dart [config.yaml]
+/// Usage: dart run packages/modbus_simulator/bin/slave_simulator.dart [config.yaml]
 void main(List<String> args) async {
-  final configPath = args.isNotEmpty ? args[0] : 'simulator/device_config.yaml';
+  final configPath = args.isNotEmpty
+      ? args[0]
+      : 'packages/modbus_simulator/config/device_config.yaml';
 
   print('Loading configuration from: $configPath');
   final config = await PointTableConfig.fromFile(configPath);
@@ -54,7 +56,8 @@ Future<void> _runTCPSlave(PointTableConfig config) async {
   print('Slave simulator running. Press Ctrl+C to stop.');
   print('Registers:');
   for (final reg in config.registers) {
-    print('  - ${reg.name}: ${reg.type.name} @ ${reg.address} (${reg.dataType.name})');
+    print(
+        '  - ${reg.name}: ${reg.type.name} @ ${reg.address} (${reg.dataType.name})');
   }
 }
 
@@ -75,11 +78,13 @@ class ModbusStorage {
     for (final reg in config.registers) {
       switch (reg.type) {
         case RegisterType.coil:
-          coils[reg.address] = RandomValueGenerator.generateValue(DataType.bool) as bool;
+          coils[reg.address] =
+              RandomValueGenerator.generateValue(DataType.bool) as bool;
           break;
 
         case RegisterType.discreteInput:
-          discreteInputs[reg.address] = RandomValueGenerator.generateValue(DataType.bool) as bool;
+          discreteInputs[reg.address] =
+              RandomValueGenerator.generateValue(DataType.bool) as bool;
           break;
 
         case RegisterType.inputRegister:
@@ -128,7 +133,8 @@ class ModbusStorage {
 
       case DataType.string:
         final str = value as String;
-        final bytes = DataConverter.stringToBytes(str, length: (reg.quantity ?? 1) * 2);
+        final bytes =
+            DataConverter.stringToBytes(str, length: (reg.quantity ?? 1) * 2);
         final regs = DataConverter.bytesToUint16(bytes);
         for (int i = 0; i < regs.length; i++) {
           storage[reg.address + i] = regs[i];
@@ -308,7 +314,8 @@ class ModbusStorage {
       coils[address + i] = value;
     }
 
-    return ProtocolDataUnit(funcCodeWriteMultipleCoils, request.data.sublist(0, 4));
+    return ProtocolDataUnit(
+        funcCodeWriteMultipleCoils, request.data.sublist(0, 4));
   }
 
   /// Write multiple registers (FC 16)
@@ -328,7 +335,8 @@ class ModbusStorage {
       holdingRegisters[address + i] = value;
     }
 
-    return ProtocolDataUnit(funcCodeWriteMultipleRegisters, request.data.sublist(0, 4));
+    return ProtocolDataUnit(
+        funcCodeWriteMultipleRegisters, request.data.sublist(0, 4));
   }
 
   /// Create exception response

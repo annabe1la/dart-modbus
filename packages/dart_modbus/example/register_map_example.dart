@@ -1,4 +1,4 @@
-import '../lib/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 void main() async {
   // Example 1: Define register map programmatically

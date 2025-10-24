@@ -1,0 +1,14 @@
+name: modbus_simulator
+description: Modbus master/slave simulator for testing and development
+version: 1.0.0
+publish_to: none  # This package is not published to pub.dev
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  dart_modbus:
+    path: ../dart_modbus
+
+dev_dependencies:
+  lints: ^3.0.0

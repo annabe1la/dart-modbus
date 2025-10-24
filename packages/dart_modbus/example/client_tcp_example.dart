@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../lib/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 void main() async {
   // Create TCP client

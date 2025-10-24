@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: dart_modbus
+dependency_overrides:
+  dart_modbus:
+    path: ../dart_modbus

@@ -29,3 +29,12 @@ doc/api/
 .claude
 .flutter-plugins
 .flutter-plugins-dependencies
+
+# Melos
+.melos_tool/
+.melos/
+melos_*.iml
+
+# Coverage
+coverage/
+*.lcov

@@ -4,24 +4,34 @@ This directory contains master and slave simulator programs for testing Modbus c
 
 ## Overview
 
-- **slave_simulator.dart** - Modbus slave/server that responds with random data
-- **master_simulator.dart** - Modbus master/client that polls registers based on point table
-- **device_config.yaml** - Example device configuration with point table definitions
+### TCP Simulators
+- **slave_simulator.dart** - TCP slave/server that responds with random data
+- **master_simulator.dart** - TCP master/client that polls registers based on point table
+
+### Serial Simulators (RTU/ASCII)
+- **rtu_simulator.dart** - RTU protocol simulator with virtual serial port
+- **ascii_simulator.dart** - ASCII protocol simulator with virtual serial port
+
+### Configuration Files
+- **device_config.yaml** - TCP device configuration
+- **serial_config.yaml** - Serial device configuration (RTU/ASCII)
 
 ## Quick Start
 
-### 1. Start the Slave Simulator
+### TCP Communication
+
+#### 1. Start the TCP Slave Simulator
 
 In one terminal, run:
 
 ```bash
-dart run simulator/slave_simulator.dart simulator/device_config.yaml
+dart run packages/modbus_packages/modbus_simulator/config/bin/slave_simulator.dart packages/modbus_packages/modbus_simulator/config/config/device_config.yaml
 ```
 
 You should see:
 
 ```
-Loading configuration from: simulator/device_config.yaml
+Loading configuration from: packages/modbus_simulator/config/device_config.yaml
 Starting Modbus TCP Slave Simulator
 Device: Temperature Controller
 Slave ID: 1
@@ -39,13 +49,13 @@ Registers:
 In another terminal, run:
 
 ```bash
-dart run simulator/master_simulator.dart simulator/device_config.yaml
+dart run packages/modbus_simulator/config/master_simulator.dart packages/modbus_simulator/config/device_config.yaml
 ```
 
 You should see:
 
 ```
-Loading configuration from: simulator/device_config.yaml
+Loading configuration from: packages/modbus_simulator/config/device_config.yaml
 Starting Modbus TCP Master Simulator
 Device: Temperature Controller
 Slave ID: 1
@@ -131,8 +141,8 @@ registers:
 Create your own YAML file with custom register definitions:
 
 ```bash
-dart run simulator/slave_simulator.dart my_device.yaml
-dart run simulator/master_simulator.dart my_device.yaml
+dart run packages/modbus_simulator/config/slave_simulator.dart my_device.yaml
+dart run packages/modbus_simulator/config/master_simulator.dart my_device.yaml
 ```
 
 ### Changing Poll Interval
@@ -151,15 +161,95 @@ The slave supports write operations. You can write to:
 
 The master simulator currently only reads. To test writes, modify the master code or use a standard Modbus client.
 
+### RTU Communication
+
+RTU simulator uses virtual serial ports for testing:
+
+```bash
+# Run RTU simulator (includes both master and slave)
+dart run packages/modbus_simulator/bin/rtu_simulator.dart
+```
+
+**Features:**
+- ✅ Binary format (efficient)
+- ✅ CRC16 checksum
+- ✅ Virtual serial port communication
+- ✅ Demonstrates master-slave communication
+
+**Configuration:**
+See `config/serial_config.yaml` for RTU configuration example.
+
+### ASCII Communication
+
+ASCII simulator uses human-readable format:
+
+```bash
+# Run ASCII simulator
+dart run packages/modbus_simulator/bin/ascii_simulator.dart
+```
+
+**Features:**
+- ✅ Human-readable format (easy to debug)
+- ✅ LRC checksum
+- ✅ Virtual serial port communication
+- ✅ 7-bit data with even parity (typical)
+
+## Virtual Serial Ports
+
+The RTU and ASCII simulators use an in-memory virtual serial port implementation for testing. This allows you to run master and slave in the same process without actual hardware.
+
+### Using Real Serial Ports
+
+To use real serial hardware, you need to implement the `SerialPort` interface using a platform-specific library:
+
+**For Flutter:**
+```yaml
+dependencies:
+  flutter_libserialport: ^0.3.0
+```
+
+**For Dart CLI:**
+```yaml
+dependencies:
+  dart_serial_port: ^0.2.0
+```
+
+**Example implementation:**
+```dart
+import 'package:flutter_libserialport/flutter_libserialport.dart' as sp;
+
+class LibSerialPort implements SerialPort {
+  // Implementation details...
+}
+```
+
+See [FAQ](../../../doc/FAQ.md) for complete implementation examples.
+
+## Protocol Comparison
+
+| Feature | TCP | RTU | ASCII |
+|---------|-----|-----|-------|
+| **Transport** | Ethernet | Serial | Serial |
+| **Format** | Binary | Binary | ASCII |
+| **Error Check** | TCP checksum | CRC16 | LRC |
+| **Speed** | Fast | Fast | Slow |
+| **Debug** | Network tools | Logic analyzer | Terminal |
+| **Distance** | Long | Short | Short |
+
 ## Limitations
 
-- Serial protocols (RTU/ASCII) are not yet implemented in the simulators
-- Only TCP protocol is currently supported
+### TCP Simulators
 - The slave generates random data on startup and doesn't update it
 - The master only performs read operations
 
+### Serial Simulators (RTU/ASCII)
+- Uses virtual serial ports (not real hardware)
+- Simplified implementation for demonstration
+- For production use, implement SerialPort with real hardware
+
 ## See Also
 
-- [device_config.yaml](device_config.yaml) - Example configuration
-- [Main README](../README.md) - Library documentation
-- [FAQ](../doc/FAQ.md) - Frequently asked questions
+- [device_config.yaml](config/device_config.yaml) - TCP configuration example
+- [serial_config.yaml](config/serial_config.yaml) - Serial configuration example
+- [Main README](../../README.md) - Library documentation
+- [FAQ](../../../doc/FAQ.md) - Frequently asked questions

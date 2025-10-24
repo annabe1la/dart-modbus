@@ -1,0 +1,67 @@
+name: "Serial Device"
+slaveId: 1
+protocol: rtu  # or 'ascii'
+address: "/dev/ttyUSB0"  # 串口设备路径（Linux/macOS）或 "COM1"（Windows）
+pollInterval: 1000
+
+# 串口配置
+serialConfig:
+  baudRate: 115200    # 波特率: 9600, 19200, 38400, 57600, 115200
+  dataBits: 8         # 数据位: 7 或 8
+  stopBits: 1         # 停止位: 1 或 2
+  parity: "N"         # 校验: N(无), E(偶), O(奇)
+
+registers:
+  # 温度传感器
+  - name: temperature
+    address: 100
+    type: inputRegister
+    dataType: float32
+    byteOrder: bigEndian
+    unit: "°C"
+    description: "Temperature sensor reading"
+    readOnly: true
+
+  # 湿度传感器
+  - name: humidity
+    address: 102
+    type: inputRegister
+    dataType: float32
+    byteOrder: bigEndian
+    unit: "%RH"
+    description: "Humidity sensor reading"
+    readOnly: true
+
+  # 控制模式
+  - name: controlMode
+    address: 200
+    type: holdingRegister
+    dataType: uint16
+    description: "0=Manual, 1=Auto"
+    readOnly: false
+
+  # 设置点
+  - name: setpoint
+    address: 201
+    type: holdingRegister
+    dataType: int16
+    multiplier: 0.1
+    unit: "°C"
+    description: "Temperature setpoint"
+    readOnly: false
+
+  # 系统状态
+  - name: systemOn
+    address: 0
+    type: coil
+    dataType: bool
+    description: "System power"
+    readOnly: false
+
+  # 告警状态
+  - name: alarmActive
+    address: 1
+    type: discreteInput
+    dataType: bool
+    description: "Alarm status"
+    readOnly: true
