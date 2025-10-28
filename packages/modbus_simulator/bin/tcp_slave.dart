@@ -3,16 +3,36 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:dart_modbus/modbus.dart';
 import 'lib/slave_base.dart';
+import 'lib/port_utils.dart';
 
 /// Modbus TCP 从站模拟器
 ///
 /// 模拟 TCP 从设备（服务器端）
-/// Usage: dart run packages/modbus_simulator/bin/tcp_slave.dart [port]
+/// Usage: dart run packages/modbus_simulator/bin/tcp_slave.dart [host] [port]
+///   host: 默认 127.0.0.1
+///   port: 默认 5020
 void main(List<String> args) async {
   print('=== Modbus TCP Slave Simulator ===\n');
 
-  final port = args.isNotEmpty ? int.parse(args[0]) : 502;
-  final host = '127.0.0.1';
+  final host = args.isNotEmpty ? args[0] : '127.0.0.1';
+  final preferredPort = args.length > 1 ? int.parse(args[1]) : 5020;
+
+  // 查找可用端口
+  print('Checking port availability...');
+  int port;
+  try {
+    if (await PortUtils.isPortAvailable(host, preferredPort)) {
+      port = preferredPort;
+      print('✓ Port $preferredPort is available\n');
+    } else {
+      print('⚠ Port $preferredPort is in use, searching for available port...');
+      port = await PortUtils.findAvailablePort(host, preferredPort + 1);
+      print('✓ Found available port: $port\n');
+    }
+  } catch (e) {
+    print('✗ Error finding available port: $e');
+    exit(1);
+  }
 
   // 创建 TCP 从站
   final slave = TCPSlaveImpl(
@@ -28,8 +48,7 @@ void main(List<String> args) async {
     // 预加载测试数据
     slave.preloadTestData();
 
-    print('\nSlave is running...');
-    print('Listening on: $host:$port');
+    print('✓ Slave is running on $host:$port');
     print('\nTest data:');
     print('  - Coil 0 = true');
     print('  - Coil 1 = false');

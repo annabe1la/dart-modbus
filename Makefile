@@ -14,8 +14,12 @@ help:
 	@echo "  make ci             - 运行完整 CI 检查"
 	@echo "  make clean          - 清理构建产物"
 	@echo ""
-	@echo "  make slave          - 启动从站模拟器"
-	@echo "  make master         - 启动主站模拟器"
+	@echo "  make tcp-slave      - 启动 TCP 从站模拟器"
+	@echo "  make tcp-master     - 启动 TCP 主站模拟器"
+	@echo "  make rtu-slave      - 启动 RTU 从站模拟器"
+	@echo "  make rtu-master     - 启动 RTU 主站模拟器"
+	@echo "  make ascii-slave    - 启动 ASCII 从站模拟器"
+	@echo "  make ascii-master   - 启动 ASCII 主站模拟器"
 	@echo ""
 	@echo "更多命令请运行: melos run"
 
@@ -53,13 +57,26 @@ clean:
 	dart pub cache clean
 	rm -rf .dart_tool build coverage
 
-# 启动从站模拟器
-slave:
-	melos run simulator:slave
+# TCP 模拟器
+tcp-slave:
+	melos run simulator:tcp:slave
 
-# 启动主站模拟器
-master:
-	melos run simulator:master
+tcp-master:
+	melos run simulator:tcp:master
+
+# RTU 模拟器
+rtu-slave:
+	melos run simulator:rtu:slave
+
+rtu-master:
+	melos run simulator:rtu:master
+
+# ASCII 模拟器
+ascii-slave:
+	melos run simulator:ascii:slave
+
+ascii-master:
+	melos run simulator:ascii:master
 
 # 查看 CHANGELOG
 changelog:

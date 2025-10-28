@@ -6,11 +6,13 @@ import 'package:dart_modbus/modbus.dart';
 ///
 /// 模拟 TCP 主设备（客户端）
 /// Usage: dart run packages/modbus_simulator/bin/tcp_master.dart [host] [port]
+///   host: 默认 127.0.0.1
+///   port: 默认 5020
 void main(List<String> args) async {
   print('=== Modbus TCP Master Simulator ===\n');
 
   final host = args.isNotEmpty ? args[0] : '127.0.0.1';
-  final port = args.length > 1 ? int.parse(args[1]) : 502;
+  final port = args.length > 1 ? int.parse(args[1]) : 5020;
 
   // 创建 TCP 客户端
   final provider = TCPClientProvider('$host:$port');

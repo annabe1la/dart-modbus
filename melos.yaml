@@ -64,13 +64,13 @@ scripts:
 
   # TCP 模拟器
   simulator:tcp:slave:
-    run: dart run packages/modbus_simulator/bin/tcp_slave.dart
-    description: 启动 Modbus TCP 从站模拟器
+    run: dart run packages/modbus_simulator/bin/tcp_slave.dart 127.0.0.1 5020
+    description: 启动 Modbus TCP 从站模拟器 (端口冲突时自动查找可用端口)
     packageFilters:
       scope: modbus_simulator
 
   simulator:tcp:master:
-    run: dart run packages/modbus_simulator/bin/tcp_master.dart
+    run: dart run packages/modbus_simulator/bin/tcp_master.dart 127.0.0.1 5020
     description: 启动 Modbus TCP 主站模拟器
     packageFilters:
       scope: modbus_simulator
