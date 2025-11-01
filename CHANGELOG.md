@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+#### Modbus Simulator Tests
+- Fixed all test cases to use correct API (ModbusClientImpl instead of abstract ModbusClient)
+- Corrected method parameters for writeMultipleCoils, writeMultipleRegisters, readWriteMultipleRegisters
+- Updated to handle Uint8List/Uint16List return values correctly
+- Fixed serial port initialization (call open() before accessing stream)
+- Corrected CRC16 byte order handling (little-endian)
+
+#### TCP Communication
+- Implemented TCP persistent connection support with write mutex lock
+- Added proper TCP packet fragmentation handling on server side
+- Fixed concurrent request handling through write serialization
+- Implemented transaction ID-based request/response matching
+- Added buffer-based frame parsing to handle multiple requests in one TCP packet
+
+### Added
+
+#### Modbus Simulator Storage
+- Added `setInputRegisters` method for batch setting input registers
+- Implemented Mask Write Register (FC 0x16) functionality
+- Implemented Read/Write Multiple Registers (FC 0x17) functionality
+
+#### Testing
+- Added comprehensive TCP communication tests (7 tests)
+- Added RTU communication tests (20 tests)
+- Added ASCII communication tests (20 tests)
+- All 47 tests passing with full protocol coverage
+- Test coverage includes:
+  - Basic read/write operations
+  - Data type conversions (float32, int32, string)
+  - Concurrent and sequential requests
+  - Large data transfers (max 125 registers)
+  - Checksum verification (CRC16 for RTU, LRC for ASCII)
+  - Multiple slave ID support
+
 ## [0.1.0] - 2025-10-24
 
 ### Added
@@ -54,7 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Documentation
 - Comprehensive dartdoc comments for all public APIs
 - Complete usage examples for all features
-- FAQ with 30+ common questions and answers
 - Detailed README with advanced features section
 
 #### Testing

@@ -70,6 +70,12 @@ class ModbusStorage {
     return List.generate(quantity, (i) => getInputRegister(address + i));
   }
 
+  void setInputRegisters(int address, List<int> values) {
+    for (int i = 0; i < values.length; i++) {
+      setInputRegister(address + i, values[i]);
+    }
+  }
+
   // ==================== 请求处理 ====================
 
   /// 处理 Modbus 请求并返回响应
@@ -93,6 +99,10 @@ class ModbusStorage {
           return _writeMultipleCoils(request);
         case funcCodeWriteMultipleRegisters:
           return _writeMultipleRegisters(request);
+        case funcCodeMaskWriteRegister:
+          return _maskWriteRegister(request);
+        case funcCodeReadWriteMultipleRegisters:
+          return _readWriteMultipleRegisters(request);
         default:
           return _exceptionResponse(
               request.funcCode, exceptionCodeIllegalFunction);
@@ -258,6 +268,64 @@ class ModbusStorage {
 
     return ProtocolDataUnit(
         funcCodeWriteMultipleRegisters, request.data.sublist(0, 4));
+  }
+
+  ProtocolDataUnit _maskWriteRegister(ProtocolDataUnit request) {
+    final data = ByteData.sublistView(Uint8List.fromList(request.data));
+    final address = data.getUint16(0, Endian.big);
+    final andMask = data.getUint16(2, Endian.big);
+    final orMask = data.getUint16(4, Endian.big);
+
+    // Result = (Current AND andMask) OR (orMask AND NOT andMask)
+    final currentValue = getHoldingRegister(address);
+    final newValue = (currentValue & andMask) | (orMask & ~andMask);
+    setHoldingRegister(address, newValue);
+
+    return ProtocolDataUnit(funcCodeMaskWriteRegister, request.data);
+  }
+
+  ProtocolDataUnit _readWriteMultipleRegisters(ProtocolDataUnit request) {
+    final data = ByteData.sublistView(Uint8List.fromList(request.data));
+    final readAddress = data.getUint16(0, Endian.big);
+    final readQuantity = data.getUint16(2, Endian.big);
+    final writeAddress = data.getUint16(4, Endian.big);
+    final writeQuantity = data.getUint16(6, Endian.big);
+    final byteCount = request.data[8];
+    final registerBytes = request.data.sublist(9);
+
+    if (readQuantity < 1 ||
+        readQuantity > 125 ||
+        writeQuantity < 1 ||
+        writeQuantity > 121 ||
+        byteCount != writeQuantity * 2 ||
+        registerBytes.length != byteCount) {
+      return _exceptionResponse(
+          request.funcCode, exceptionCodeIllegalDataValue);
+    }
+
+    // 先写入
+    final writeRegisters = <int>[];
+    for (int i = 0; i < writeQuantity; i++) {
+      final offset = i * 2;
+      final value =
+          (registerBytes[offset] << 8) | registerBytes[offset + 1];
+      writeRegisters.add(value);
+    }
+    setHoldingRegisters(writeAddress, writeRegisters);
+
+    // 再读取
+    final readRegisters = getHoldingRegisters(readAddress, readQuantity);
+    final readByteCount = readQuantity * 2;
+    final result = Uint8List(readByteCount + 1);
+    result[0] = readByteCount;
+
+    for (int i = 0; i < readQuantity; i++) {
+      final offset = 1 + i * 2;
+      result[offset] = (readRegisters[i] >> 8) & 0xFF;
+      result[offset + 1] = readRegisters[i] & 0xFF;
+    }
+
+    return ProtocolDataUnit(funcCodeReadWriteMultipleRegisters, result);
   }
 
   // ==================== 工具方法 ====================

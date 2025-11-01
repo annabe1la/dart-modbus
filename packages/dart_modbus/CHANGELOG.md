@@ -54,7 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Documentation
 - Comprehensive dartdoc comments for all public APIs
 - Complete usage examples for all features
-- FAQ with 30+ common questions and answers
 - Detailed README with advanced features section
 
 #### Testing
