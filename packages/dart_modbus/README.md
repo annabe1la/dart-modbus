@@ -2,11 +2,10 @@
 
 A pure Dart modbus library supporting RTU, ASCII, and TCP client/server implementations. This library is a Dart port of the [go-modbus](https://github.com/things-go/go-modbus) library.
 
-📚 **[快速开始 Quick Start](QUICK_START.md)** | 📖 **[Melos 指南](doc/MELOS_GUIDE.md)** | ❓ **[FAQ](doc/FAQ.md)**
-
 ## Features
 
 - **Modbus TCP Client** - Connect to Modbus TCP servers
+- **Modbus TCP Server** - Create Modbus TCP servers
 - **Modbus RTU Client** - Connect to Modbus RTU devices over serial
 - **Modbus ASCII Client** - Connect to Modbus ASCII devices over serial
 - **Pure Dart** - No native dependencies (except for serial port implementation)
@@ -19,7 +18,7 @@ A pure Dart modbus library supporting RTU, ASCII, and TCP client/server implemen
 
 ## Supported Functions
 
-### Bit Access
+### A bit Access
 - Read Discrete Inputs (FC 02)
 - Read Coils (FC 01)
 - Write Single Coil (FC 05)
@@ -40,7 +39,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  modbus: ^1.0.0
+  dart_modbus: ^1.0.0
 ```
 
 ## Usage
@@ -48,7 +47,7 @@ dependencies:
 ### Modbus TCP Client
 
 ```dart
-import 'package:modbus/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 void main() async {
   final provider = TCPClientProvider('192.168.1.100:502');
@@ -74,6 +73,48 @@ void main() async {
 }
 ```
 
+### Modbus TCP Server
+
+```dart
+import 'package:dart_modbus/modbus.dart';
+
+void main() async {
+  // Create a simple server that handles requests
+  final server = ModbusTCPServer(
+    host: '127.0.0.1',
+    port: 502,
+    requestHandler: (slaveId, request) async {
+      // Handle Modbus requests and return responses
+      final funcCode = request.funcCode;
+
+      if (funcCode == mbFuncCodeReadHoldingRegisters) {
+        // Parse request
+        final address = ByteData.sublistView(request.data).getUint16(0, Endian.big);
+        final quantity = ByteData.sublistView(request.data).getUint16(2, Endian.big);
+
+        // Generate response data
+        final data = Uint8List(1 + quantity * 2);
+        data[0] = quantity * 2; // byte count
+
+        // Fill with example values
+        for (var i = 0; i < quantity; i++) {
+          ByteData.sublistView(data).setUint16(1 + i * 2, address + i, Endian.big);
+        }
+
+        return ProtocolDataUnit(funcCode, data);
+      }
+
+      return null; // Return null for unsupported function codes
+    },
+  );
+
+  await server.start();
+  print('Server running on ${server.isRunning}');
+
+  // Keep server running...
+}
+```
+
 ### Modbus RTU Client
 
 For RTU/ASCII clients, you need to implement the `SerialPort` interface using a platform-specific serial library such as:
@@ -81,7 +122,7 @@ For RTU/ASCII clients, you need to implement the `SerialPort` interface using a 
 - [dart_serial_port](https://pub.dev/packages/dart_serial_port) for Dart
 
 ```dart
-import 'package:modbus/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 // Implement SerialPort using your chosen serial library
 class MySerialPort implements SerialPort {
@@ -116,7 +157,7 @@ void main() async {
 Similar to RTU, but uses ASCII encoding:
 
 ```dart
-import 'package:modbus/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 void main() async {
   final serialPort = MySerialPort(config);
@@ -131,11 +172,15 @@ void main() async {
 
 The library follows a provider pattern:
 
+### Client
 - `ModbusClient` - High-level client interface with all Modbus functions
 - `ClientProvider` - Low-level protocol provider interface
 - `TCPClientProvider` - TCP/IP implementation
 - `RTUClientProvider` - RTU (serial) implementation with CRC16 checksum
 - `ASCIIClientProvider` - ASCII (serial) implementation with LRC checksum
+
+### Server
+- `ModbusTCPServer` - TCP server implementation with custom request handler
 
 ## Advanced Features
 
@@ -144,7 +189,7 @@ The library follows a provider pattern:
 The library includes utilities for converting between Modbus registers and common data types:
 
 ```dart
-import 'package:modbus/modbus.dart';
+import 'package:dart_modbus/modbus.dart';
 
 // Read Float32 (2 registers)
 final bytes = await client.readHoldingRegistersBytes(1, 100, 2);
@@ -222,18 +267,20 @@ See the [example](example/) directory for complete examples:
 
 ## Simulator Tools
 
-The [simulator](simulator/) directory contains master/slave simulator programs for testing:
+This package is part of a monorepo that includes the [modbus_simulator](../modbus_simulator/) package for testing:
 - `slave_simulator.dart` - Modbus slave that responds with random data
 - `master_simulator.dart` - Modbus master that polls based on point table
-- `device_config.yaml` - Example device configuration
+- `rtu_simulator.dart` - RTU protocol simulator with virtual serial port
+- `ascii_simulator.dart` - ASCII protocol simulator with virtual serial port
+- Configuration files for device setup
 
-See [simulator/README.md](simulator/README.md) for usage instructions.
+See the [modbus_simulator README](../modbus_simulator/README.md) for usage instructions.
 
 ## Documentation
 
-- [API Documentation](https://pub.dev/documentation/modbus/latest/)
-- [FAQ](doc/FAQ.md) - Frequently asked questions
+- [API Documentation](https://pub.dev/documentation/dart_modbus/latest/)
 - [Examples](example/) - Complete working examples
+- [Simulator Tools](../modbus_simulator/) - Testing tools for Modbus communication
 
 ## References
 
