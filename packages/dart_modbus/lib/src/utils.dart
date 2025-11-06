@@ -23,7 +23,6 @@ Uint16List bytesToUint16(List<int> bytes) {
 
 /// Create PDU data block with suffix
 List<int> pduDataBlockSuffix(List<int> suffix, List<int> values) {
-  final length = values.length * 2;
   final data = <int>[];
 
   for (final v in values) {

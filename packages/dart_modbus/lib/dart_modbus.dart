@@ -1,5 +1,5 @@
-/// A pure Dart modbus library supporting RTU, ASCII, and TCP client implementations
-library modbus;
+/// A pure Dart modbus library supporting RTU, ASCII, and TCP client/server implementations
+library dart_modbus;
 
 export 'src/modbus.dart';
 export 'src/crc.dart';

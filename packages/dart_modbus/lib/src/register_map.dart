@@ -176,30 +176,22 @@ class RegisterDefinition {
     switch (dataType) {
       case DataType.uint16:
         return DataConverter.uint16ToBytes([value as int]);
-        break;
       case DataType.int16:
         return DataConverter.int16ToBytes([value as int]);
-        break;
       case DataType.uint32:
         return DataConverter.uint32ToBytes(value as int, byteOrder: byteOrder);
-        break;
       case DataType.int32:
         return DataConverter.int32ToBytes(value as int, byteOrder: byteOrder);
-        break;
       case DataType.float32:
         return DataConverter.float32ToBytes(value as double, byteOrder: byteOrder);
-        break;
       case DataType.float64:
         return DataConverter.float64ToBytes(value as double, byteOrder: byteOrder);
-        break;
       case DataType.bool:
         final bytes = Uint8List(1);
         DataConverter.setBit(bytes, 0, value as bool);
         return bytes;
-        break;
       case DataType.string:
         return DataConverter.stringToBytes(value as String, length: registerCount * 2);
-        break;
     }
   }
 

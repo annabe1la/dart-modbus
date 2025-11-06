@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:dart_modbus/modbus.dart';
+import 'package:dart_modbus/dart_modbus.dart';
 
 // Example implementation of SerialPort for demonstration
 // In production, use a real serial port library like flutter_libserialport

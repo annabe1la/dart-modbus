@@ -47,7 +47,7 @@ dependencies:
 ### Modbus TCP Client
 
 ```dart
-import 'package:dart_modbus/modbus.dart';
+import 'package:dart_modbus/dart_modbus.dart';
 
 void main() async {
   final provider = TCPClientProvider('192.168.1.100:502');
@@ -76,7 +76,7 @@ void main() async {
 ### Modbus TCP Server
 
 ```dart
-import 'package:dart_modbus/modbus.dart';
+import 'package:dart_modbus/dart_modbus.dart';
 
 void main() async {
   // Create a simple server that handles requests
@@ -122,7 +122,7 @@ For RTU/ASCII clients, you need to implement the `SerialPort` interface using a 
 - [dart_serial_port](https://pub.dev/packages/dart_serial_port) for Dart
 
 ```dart
-import 'package:dart_modbus/modbus.dart';
+import 'package:dart_modbus/dart_modbus.dart';
 
 // Implement SerialPort using your chosen serial library
 class MySerialPort implements SerialPort {
@@ -157,7 +157,7 @@ void main() async {
 Similar to RTU, but uses ASCII encoding:
 
 ```dart
-import 'package:dart_modbus/modbus.dart';
+import 'package:dart_modbus/dart_modbus.dart';
 
 void main() async {
   final serialPort = MySerialPort(config);
@@ -189,7 +189,7 @@ The library follows a provider pattern:
 The library includes utilities for converting between Modbus registers and common data types:
 
 ```dart
-import 'package:dart_modbus/modbus.dart';
+import 'package:dart_modbus/dart_modbus.dart';
 
 // Read Float32 (2 registers)
 final bytes = await client.readHoldingRegistersBytes(1, 100, 2);
